@@ -1,9 +1,10 @@
 from typing import List
 from fastapi import status, HTTPException, Depends, APIRouter, Response
 from fastapi.params import Body #for deconstructing request body
-from .. import models, schemas, utils
+from .. import models, schemas, oauth2
 from ..database import get_db
 from sqlalchemy.orm import Session
+
 
 router = APIRouter(
     prefix="/posts",
@@ -11,7 +12,7 @@ router = APIRouter(
 )
 
 @router.get("/", response_model = List[schemas.PostResponse])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     # cursor.execute("""SELECT * from posts""")
     # posts = cursor.fetchall()
@@ -20,7 +21,7 @@ def get_posts(db: Session = Depends(get_db)):
     return posts
 
 @router.post("/", response_model = schemas.PostResponse)
-def create_posts(new_post: schemas.CreatePost, response: Response, db: Session = Depends(get_db)):
+def create_posts(new_post: schemas.CreatePost, response: Response, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
    
     # cursor.execute(""" INSERT INTO posts(title, content, published)
     # VALUES(%s, %s, %s) RETURNING * ;""", (new_post.title, new_post.content, new_post.published))
@@ -37,7 +38,7 @@ def create_posts(new_post: schemas.CreatePost, response: Response, db: Session =
     return created_post
 
 @router.get("/latest", response_model = schemas.PostResponse)
-def get_latest_post( db: Session = Depends(get_db)):
+def get_latest_post( db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     
     # cursor.execute("""SELECT * FROM posts ORDER BY ID DESC LIMIT 1;""")
     # post = cursor.fetchone()
@@ -46,7 +47,7 @@ def get_latest_post( db: Session = Depends(get_db)):
     return post
 
 @router.get("/{id}", response_model = schemas.PostResponse)
-def get_post(id: int, db: Session = Depends(get_db)):
+def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     # cursor.execute("""SELECT * FROM posts WHERE id=%s;""", (id,))
     # post = cursor.fetchone()
@@ -63,7 +64,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
     return post
 
 @router.delete("/{id}")
-def delete_post(id:int, response: Response,  db: Session = Depends(get_db)):
+def delete_post(id:int, response: Response,  db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     # cursor.execute("""DELETE FROM posts WHERE id=%s RETURNING *;""",(id,))
     # deleted_post = cursor.fetchone()
@@ -83,7 +84,7 @@ def delete_post(id:int, response: Response,  db: Session = Depends(get_db)):
 
 
 @router.put("/{id}", response_model = schemas.PostResponse)
-def update_post(id:int, update_post: schemas.UpdatePost, response: Response,  db: Session = Depends(get_db)):
+def update_post(id:int, update_post: schemas.UpdatePost, response: Response,  db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
    
     # cursor.execute("""SELECT * FROM posts WHERE id=%s ;""", (id,))
     # post = cursor.fetchone()

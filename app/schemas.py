@@ -32,3 +32,14 @@ class UserResponse(BaseModel):
     email: EmailStr
     class Config:
         orm_mode = True
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class TokenData(BaseModel):
+    id: Optional[str] = None
+
+class Token(BaseModel):
+    token: str
+    token_type: str
