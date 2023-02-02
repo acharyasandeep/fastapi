@@ -6,8 +6,8 @@ from . import models
 from .database import engine
 from .routers import post, user, auth, vote
 
-models.Base.metadata.create_all(bind=engine)
 
+# models.Base.metadata.create_all(bind=engine) #we can use alembeic, no longer needed to create tables at restart
 app = FastAPI()
 
 app.include_router(post.router)
